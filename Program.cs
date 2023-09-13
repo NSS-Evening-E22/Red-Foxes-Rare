@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//Get all posts
+// Get all posts
 app.MapGet("/posts", (RareAPIDbContext db) =>
 {
     List<Post> posts = db.Posts
@@ -82,6 +82,67 @@ app.MapGet("/posts/{postId}", (RareAPIDbContext db, int postId) =>
 });
 
 // View current users posts
-app.MapGet("/", () => { });
+app.MapGet("/posts/users/{userId}", (RareAPIDbContext db, int userId) =>
+{
+    List<Post> posts = db.Posts
+    .Include(p => p.RareUser)
+    .Include(p => p.Category)
+    .Include(p => p.Tags)
+    .Include(p => p.Reactions)
+    .Where(p => p.RareUserId == userId).ToList();
+    if (posts.Count == 0)
+    {
+        return Results.NotFound("User has no posts");
+    }
+    return Results.Ok(posts);
+});
+
+// Create a post
+app.MapPost("/posts", (RareAPIDbContext db, Post post) =>
+{
+    try
+    {
+        db.Posts.Add(post);
+        db.SaveChanges();
+        return Results.Created($"/posts/{post.Id}", post);
+    }
+    catch (DbUpdateException)
+    {
+        return Results.NotFound("Post was not created");
+    }
+});
+
+// Edit a post
+app.MapPut("/posts/{postId}", (RareAPIDbContext db, int postId, Post post) =>
+{
+    Post postToUpdate = db.Posts.FirstOrDefault(p => p.Id == postId);
+    if (postToUpdate == null)
+    {
+        return Results.NotFound("This post was not found");
+    }
+
+    postToUpdate.RareUserId = post.RareUserId;
+    postToUpdate.CategoryId = post.CategoryId;
+    postToUpdate.Title = post.Title;
+    postToUpdate.ImageUrl = post.ImageUrl;
+    postToUpdate.Content = post.Content;
+    postToUpdate.Approved = post.Approved;
+    db.Update(postToUpdate);
+    db.SaveChanges();
+    return Results.Ok(postToUpdate);
+});
+
+// Delete a post
+app.MapPut("/posts/{postId}", (RareAPIDbContext db, int postId) =>
+{
+    Post post = db.Posts.FirstOrDefault(p => p.Id == postId);
+    if (post == null)
+    {
+        return Results.NotFound("Post not found");
+    }
+    db.Remove(post);
+    db.SaveChanges();
+    return Results.NoContent();
+});
 app.Run();
 
