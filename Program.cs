@@ -2,6 +2,7 @@ using GroupRareAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,7 @@ builder.Services.Configure<JsonOptions>(options =>
 var app = builder.Build();
 
 // Add a comment
-app.MapPut("/posts/{id}/comment", (RareAPIDbContext db, Comment comment) =>
+app.MapPost("/posts/{id}/comment", (RareAPIDbContext db, Comment comment) =>
 {
     db.Comments.Add(comment);
     db.SaveChanges();
@@ -37,6 +38,32 @@ app.MapGet("/posts/{id}/comment", (RareAPIDbContext db, int postId) =>
 {
     var postComments = db.Comments.Where(c => c.PostId == postId).ToList();
     return Results.Ok(postComments);
+});
+
+// Edit a comment
+app.MapPut("/posts/{id}/comment", (RareAPIDbContext db, int commentId, Comment comment) => 
+{
+    Comment commentToUpdate = db.Comments.FirstOrDefault(c => c.Id ==  commentId);
+    if (commentToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    commentToUpdate.Content = comment.Content;
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
+// Delete a comment
+app.MapDelete("/posts/{id}/comment", (RareAPIDbContext db, int id) =>
+{
+    Comment commentToDelete = db.Comments.FirstOrDefault(c => c.Id == id);
+    if (commentToDelete == null)
+    {
+        return Results.NotFound();
+    }
+    db.Comments.Remove(commentToDelete);
+    db.SaveChanges();
+    return Results.NoContent();
 });
 
 // Configure the HTTP request pipeline.
