@@ -24,6 +24,21 @@ builder.Services.Configure<JsonOptions>(options =>
 
 var app = builder.Build();
 
+// Add a comment
+app.MapPut("/posts/{id}/comment", (RareAPIDbContext db, Comment comment) =>
+{
+    db.Comments.Add(comment);
+    db.SaveChanges();
+    return Results.Created($"/comments/{comment.Id}", comment);
+});
+
+// Get a post's comments
+app.MapGet("/posts/{id}/comment", (RareAPIDbContext db, int postId) =>
+{
+    var postComments = db.Comments.Where(c => c.PostId == postId).ToList();
+    return Results.Ok(postComments);
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
