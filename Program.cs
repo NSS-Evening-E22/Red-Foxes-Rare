@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -74,6 +75,39 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//View all categories
+app.MapGet("/category", (RareAPIDbContext db) =>
+{
+    return db.Categories.ToList();
+});
+
+// Get Posts by Category
+app.MapGet("/posts/categories/{CategoryId}", (int CategoryId, RareAPIDbContext db) =>
+{
+    var category = db.Categories.FirstOrDefault(c => c.Id == CategoryId);
+
+    if (category == null)
+    {
+        return Results.NotFound("Category not found");
+    }
+
+    var postsInCategory = db.Posts
+        .Where(p => p.CategoryId == CategoryId)
+        .ToList();
+
+    return Results.Ok(postsInCategory);
+});
+
+//Create New Category
+app.MapPost("/categories", (Category category, RareAPIDbContext db) =>
+{
+    db.Categories.Add(category);
+    db.SaveChanges();
+
+    return Results.Created($"/category/{category.Id}", category);
+});
+
 
 app.Run();
 
