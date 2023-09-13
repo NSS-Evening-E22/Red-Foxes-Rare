@@ -108,6 +108,20 @@ app.MapPost("/categories", (Category category, RareAPIDbContext db) =>
     return Results.Created($"/category/{category.Id}", category);
 });
 
+app.MapDelete("/api/categories/{Id}", (int Id, RareAPIDbContext db) =>
+{
+    Category category = db.Categories.FirstOrDefault(c => c.Id == Id);
+
+    if (category == null)
+    {
+        return Results.NotFound();
+    }
+
+    db.Categories.Remove(category);
+    db.SaveChanges();
+
+    return Results.Ok(category);
+});
 
 app.Run();
 
