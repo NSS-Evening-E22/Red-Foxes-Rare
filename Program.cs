@@ -194,7 +194,7 @@ app.MapPut("/posts/{postId}", (RareAPIDbContext db, int postId, Post post) =>
 });
 
 // Delete a post
-app.MapPut("/posts/{postId}", (RareAPIDbContext db, int postId) =>
+app.MapDelete("/posts/{postId}", (RareAPIDbContext db, int postId) =>
 {
     Post post = db.Posts.FirstOrDefault(p => p.Id == postId);
     if (post == null)
