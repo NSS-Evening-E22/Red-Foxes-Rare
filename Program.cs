@@ -33,5 +33,40 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//Get all posts
+app.MapGet("/posts", (RareAPIDbContext db) =>
+{
+    List<Post> posts = db.Posts
+    .Include(p => p.RareUser)
+    .Include(p => p.Category)
+    .Include(p => p.Tags)
+    .Include(p => p.Reactions).ToList();
+
+    if (posts.Count == 0)
+    {
+        return Results.NotFound("There are no posts");
+    }
+    return Results.Ok(posts);
+});
+
+// Get single posts details
+app.MapGet("/posts/{postId}", (RareAPIDbContext db, int postId) =>
+{
+    Post post = db.Posts
+    .Include(p => p.RareUser)
+    .Include(p => p.Category)
+    .Include(p => p.Tags)
+    .Include(p => p.Reactions)
+    .FirstOrDefault(p => p.Id == postId);
+
+    if (post == null)
+    {
+        return Results.NotFound("Post not found");
+    }
+    return Results.Ok(post);
+});
+
+// View current users posts
+app.MapGet("/", () => { });
 app.Run();
 
