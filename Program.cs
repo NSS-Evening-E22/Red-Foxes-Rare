@@ -219,5 +219,24 @@ app.MapDelete("/posts/{postId}", (RareAPIDbContext db, int postId) =>
     db.SaveChanges();
     return Results.NoContent();
 });
+
+// View posts from subscribed users
+app.MapGet("/home/subscribed/{followerId}", (RareAPIDbContext db, int userId) =>
+{
+    List<int> subscribedUserIds = db.Subscriptions
+    .Where(sub => sub.FollowerId == userId)
+    .Select(sub => sub.AuthorId)
+    .ToList();
+
+    var posts = db.Posts
+    .Include(p => p.RareUser)
+    .Include(p => p.Category)
+    .Include(p => p.Tags)
+    .Include(p => p.Reactions)
+    .Where(p => subscribedUserIds.Contains(p.RareUserId));
+
+    return Results.Ok(posts);
+});
+
 app.Run();
 
