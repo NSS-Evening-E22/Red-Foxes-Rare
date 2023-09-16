@@ -277,5 +277,51 @@ app.MapGet("/home/subscribed/{followerId}", (RareAPIDbContext db, int userId) =>
     return Results.Ok(posts);
 });
 
+//TAGS ENDPOINTS
+app.MapPost("/tags", (RareAPIDbContext db, Tag tag) =>
+{
+    try
+    {
+        db.Tags.Add(tag);
+        db.SaveChanges();
+        return Results.Created($"/tags/{tag.Id}", tag);
+    }
+    catch (DbUpdateException)
+    {
+        return Results.NotFound();
+    }
+});
+
+app.MapGet("/tags", (RareAPIDbContext db) =>
+{
+    return db.Tags.ToList();
+});
+
+app.MapPut("/tags/{id}", (RareAPIDbContext db, int id, Tag tag) =>
+{
+    Tag tagToUpdate = db.Tags.SingleOrDefault(tag => tag.Id == id);
+    if (tagToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    tagToUpdate.Label = tag.Label;
+
+    db.Update(tagToUpdate);
+    db.SaveChanges();
+    return Results.Ok(tagToUpdate);
+});
+
+app.MapDelete("/tags/{id}", (RareAPIDbContext db, int id) =>
+{
+    Tag tag = db.Tags.SingleOrDefault(tag => tag.Id == id);
+    if (tag == null)
+    {
+        return Results.NotFound();
+    }
+    db.Tags.Remove(tag);
+    db.SaveChanges();
+    return Results.NoContent();
+ )};
+
 app.Run();
 
