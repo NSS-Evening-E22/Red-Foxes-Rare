@@ -340,7 +340,8 @@ app.MapDelete("/tags/{id}", (RareAPIDbContext db, int id) =>
     db.Tags.Remove(tag);
     db.SaveChanges();
     return Results.NoContent();
- )};
+});
+ 
 
 //POST/add tag to post
 app.MapPost("/posttag", (int PostId, int TagId, RareAPIDbContext db) =>
@@ -389,7 +390,7 @@ app.MapDelete("/posttag/{id}", (int PostId, int TagId, RareAPIDbContext db) =>
 });
 
 //GET/search tags
-app.MapGet("/tags/{id}", (RareAPIDbContext db, int Id) =>
+app.MapGet("/tags/{id}", (RareAPIDbContext db, string tag) =>
 {
     // Find the Tag by name (you can also use tagId if you prefer)
     var tagEntity = db.Tags.FirstOrDefault(t => t.Label == tag);
