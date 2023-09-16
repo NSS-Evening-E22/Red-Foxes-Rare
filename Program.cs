@@ -266,17 +266,5 @@ app.MapDelete("/tags/{id}", (RareAPIDbContext db, int id) =>
     return Results.NoContent();
 });
 
-//app.MapDelete("/posttags", (RareAPIDbContext db, int postId, int tagId) =>
-//{
-//    Post post = db.Posts
-//        .Include(p => p.Tags)
-//        .FirstOrDefault(p => p.Id == postId);
-//    if (post == null)
-//    {
-//        return Results.NotFound("Item not found");
-//    }
-//    ;
-//});
-
 app.Run();
 
