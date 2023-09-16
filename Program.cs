@@ -278,6 +278,7 @@ app.MapGet("/home/subscribed/{followerId}", (RareAPIDbContext db, int userId) =>
 });
 
 //TAGS ENDPOINTS
+//CREATE tag
 app.MapPost("/tags", (RareAPIDbContext db, Tag tag) =>
 {
     try
@@ -292,11 +293,13 @@ app.MapPost("/tags", (RareAPIDbContext db, Tag tag) =>
     }
 });
 
+//GET all tags
 app.MapGet("/tags", (RareAPIDbContext db) =>
 {
     return db.Tags.ToList();
 });
 
+//UPDATE tag
 app.MapPut("/tags/{id}", (RareAPIDbContext db, int id, Tag tag) =>
 {
     Tag tagToUpdate = db.Tags.SingleOrDefault(tag => tag.Id == id);
@@ -311,6 +314,7 @@ app.MapPut("/tags/{id}", (RareAPIDbContext db, int id, Tag tag) =>
     return Results.Ok(tagToUpdate);
 });
 
+//DELETE tag
 app.MapDelete("/tags/{id}", (RareAPIDbContext db, int id) =>
 {
     Tag tag = db.Tags.SingleOrDefault(tag => tag.Id == id);
@@ -322,6 +326,73 @@ app.MapDelete("/tags/{id}", (RareAPIDbContext db, int id) =>
     db.SaveChanges();
     return Results.NoContent();
  )};
+
+//POST/add tag to post
+app.MapPost("/posttag", (int PostId, int TagId, RareAPIDbContext db) =>
+{
+    var post = db.Posts.Include(p => p.Tags).FirstOrDefault(p => p.Id == PostId);
+
+    if (post == null)
+    {
+        return Results.NotFound();
+    }
+
+    var tagToAdd = db.Tags.FirstOrDefault(t => t.Id == TagId);
+
+    if (tagToAdd == null)
+    {
+        return Results.NotFound();
+    }
+
+    post.Tags.Add(tagToAdd);
+    db.SaveChanges();
+
+    return Results.Ok();
+});
+
+//DELETE tag from post
+app.MapDelete("/posttag/{id}", (int PostId, int TagId, RareAPIDbContext db) =>
+{
+    var post = db.Posts.Include(p => p.Tags).FirstOrDefault(p => p.Id == PostId);
+
+    if (post == null)
+    {
+        return Results.NotFound();
+    }
+
+    var tagToRemove = db.Tags.FirstOrDefault(t => t.Id == TagId);
+
+    if (tagToRemove == null)
+    {
+        return Results.NotFound();
+    }
+
+    post.Tags.Remove(tagToRemove);
+    db.SaveChanges();
+
+    return Results.NoContent();
+});
+
+//GET/search tags
+app.MapGet("/tags/{id}", (RareAPIDbContext db, int Id) =>
+{
+    // Find the Tag by name (you can also use tagId if you prefer)
+    var tagEntity = db.Tags.FirstOrDefault(t => t.Label == tag);
+    if (tagEntity == null)
+    {
+        return Results.NotFound("Tag not found.");
+    }
+    // Retrieve posts associated with the tag
+    var postsByTag = db.Posts
+        .Where(post => post.Tags.Any(t => t.Id == tagEntity.Id))
+        .ToList();
+    if (postsByTag.Count == 0)
+    {
+        return Results.NotFound("No posts found for this tag.");
+    }
+    // Return the posts associated with the tag as JSON
+    return Results.Json(postsByTag);
+});
 
 app.Run();
 
