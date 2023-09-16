@@ -258,5 +258,23 @@ app.MapDelete("/posts/{postId}", (RareAPIDbContext db, int postId) =>
     db.SaveChanges();
     return Results.NoContent();
 });
+
+//List Posts by User Profile
+app.MapGet("/api/RareUser/{userId}/Posts", (int Id, RareAPIDbContext db) =>
+{
+    var rareUser = db.RareUsers.FirstOrDefault(user => user.Id == Id);
+
+    if (rareUser == null)
+    {
+        return Results.NotFound("RareUser not found.");
+    }
+
+    var userPosts = db.Posts.Where(post => post.RareUserId == Id).ToList();
+
+    return Results.Json(userPosts);
+});
+
+
+
 app.Run();
 
