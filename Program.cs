@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.Extensions.Hosting;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,21 @@ app.MapPut("/posts/{id}/comment", (RareAPIDbContext db, int commentId, Comment c
     commentToUpdate.Content = comment.Content;
     db.SaveChanges();
     return Results.NoContent();
+});
+
+//List Posts by User Profile
+app.MapGet("/api/RareUser/{userId}/Posts", (int Id, RareAPIDbContext db) =>
+{
+    var rareUser = db.RareUsers.FirstOrDefault(user => user.Id == Id);
+
+    if (rareUser == null)
+    {
+        return Results.NotFound("RareUser not found.");
+    }
+
+    var userPosts = db.Posts.Where(post => post.RareUserId == Id).ToList();
+
+    return Results.Json(userPosts);
 });
 
 // Delete a comment
@@ -110,9 +126,11 @@ app.MapPost("/api/reactions", (RareAPIDbContext db, Reaction reaction) =>
 });
 
 //create a postreaction to postreaction table
-app.MapPost("/api/postuserreaction", (RareAPIDbContext db, PostReaction postUserReaction) => 
-{ 
+app.MapPost("/api/postuserreaction", (RareAPIDbContext db, PostReaction postUserReaction) =>
+{
     db.PostUserReaction.Add(postUserReaction);
+return Results.Ok();
+});
 
 //View all categories
 app.MapGet("/category", (RareAPIDbContext db) =>
@@ -396,16 +414,7 @@ app.MapPost("/posttag", (int PostId, int TagId, RareAPIDbContext db) =>
     if (post == null)
     {
         return Results.NotFound();
-    }
-
-    return Results.Ok(post);
-        
-        
-    
-});
-
-
-
+    }   
 
     var tagToAdd = db.Tags.FirstOrDefault(t => t.Id == TagId);
 
