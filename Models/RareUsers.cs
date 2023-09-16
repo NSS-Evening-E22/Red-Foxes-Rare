@@ -12,7 +12,10 @@
         public bool Active { get; set; }
         public bool IsStaff { get; set; }
         public string UID { get; set; }
-        public List<Subscription> Subscriptions { get; set; }
-        public List<Comment> Comments { get; set; }
+
+        public List <Subscription> subscriptions { get; set; }
+
+        public List <Comment> comments { get; set; } 
+   
     }
 }

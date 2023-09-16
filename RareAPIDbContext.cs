@@ -19,9 +19,9 @@ using GroupRareAPI.Models;
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<RareUser>().HasMany(ru => ru.Subscriptions)
+        modelBuilder.Entity<RareUser>().HasMany(ru => ru.subscriptions)
             .WithOne(s => s.Follower)
-            .HasForeignKey(s => s.FollowerId);
+           .HasForeignKey(s => s.FollowerId);
 
         modelBuilder.Entity<Category>().HasData(new Category[]
         {
