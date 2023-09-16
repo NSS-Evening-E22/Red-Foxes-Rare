@@ -110,9 +110,22 @@ app.MapPost("/api/reactions", (RareAPIDbContext db, Reaction reaction) =>
 });
 
 //create a postreaction to postreaction table
-app.MapPost("/api/postuserreaction", (RareAPIDbContext db, PostReaction postUserReaction) =>
+app.MapPost("/api/postuserreaction", (RareAPIDbContext db, int postId, int reactionId, int rareUserId) =>
 {
-    db.PostUserReaction.Add(postUserReaction);
+    var post = db.Posts.SingleOrDefault(p => p.Id == postId);
+    var reaction = db.Reactions.SingleOrDefault(r => r.Id == reactionId);
+    var user = db.RareUsers.SingleOrDefault(ru => ru.Id == rareUserId);
+
+    PostReaction newPostReaction = new PostReaction()
+    {
+        Post = post,
+        Reaction = reaction,
+        RareUser = user
+    };
+
+    db.PostUserReaction.Add(newPostReaction);
+    db.SaveChanges();
+    return Results.NoContent();
 });
 
 //View all categories
