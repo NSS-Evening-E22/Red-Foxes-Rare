@@ -110,9 +110,10 @@ app.MapPost("/api/reactions", (RareAPIDbContext db, Reaction reaction) =>
 });
 
 //create a postreaction to postreaction table
-app.MapPost("/api/postuserreaction", (RareAPIDbContext db, PostReaction postUserReaction) => 
-{ 
+app.MapPost("/api/postuserreaction", (RareAPIDbContext db, PostReaction postUserReaction) =>
+{
     db.PostUserReaction.Add(postUserReaction);
+});
 
 //View all categories
 app.MapGet("/category", (RareAPIDbContext db) =>
@@ -397,15 +398,6 @@ app.MapPost("/posttag", (int PostId, int TagId, RareAPIDbContext db) =>
     {
         return Results.NotFound();
     }
-
-    return Results.Ok(post);
-        
-        
-    
-});
-
-
-
 
     var tagToAdd = db.Tags.FirstOrDefault(t => t.Id == TagId);
 
