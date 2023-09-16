@@ -76,6 +76,44 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+//Create a subscription
+app.MapPost("/api/subscriptions", (RareAPIDbContext db, Subscription subscription) => 
+{   subscription.CreatedOn = DateTime.Now;
+    subscription.EndedOn = DateTime.Now.AddMonths(6);
+    db.Subscriptions.Add(subscription);
+    db.SaveChanges();
+    return Results.Created($"/api/subscriptions/{subscription.Id}", subscription);
+});
+
+//update a subscription to add a endedOn time
+app.MapPut("/api/subscriptions/{id}", (RareAPIDbContext db, int id, Subscription subscription) => 
+
+{
+    Subscription subscriptionToUpdate = db.Subscriptions.SingleOrDefault(s => s.Id == id);
+    if (subscriptionToUpdate == null)
+    {
+        return Results.Ok(subscription);
+    }
+    subscriptionToUpdate.EndedOn = DateTime.Now;
+    db.SaveChanges();
+    return Results.NoContent();
+});
+
+//create a new reaction
+app.MapPost("/api/reactions", (RareAPIDbContext db, Reaction reaction) => 
+{
+    db.Reactions.Add(reaction);
+    db.SaveChanges();
+    return Results.Created($"/api/reactions/{reaction.Id}", reaction);
+
+});
+
+//create a postreaction to postreaction table
+app.MapPost("/api/postuserreaction", (RareAPIDbContext db, PostReaction postUserReaction) => 
+{ 
+    db.PostUserReaction.Add(postUserReaction);
+
 //View all categories
 app.MapGet("/category", (RareAPIDbContext db) =>
 {
@@ -255,23 +293,29 @@ app.MapDelete("/posts/{postId}", (RareAPIDbContext db, int postId) =>
         return Results.NotFound("Post not found");
     }
     db.Remove(post);
+
     db.SaveChanges();
     return Results.NoContent();
 });
 
-//List Posts by User Profile
-app.MapGet("/api/RareUser/{userId}/Posts", (int Id, RareAPIDbContext db) =>
+
+//create a postreaction to postreaction table
+app.MapPost("/api/postreaction", (RareAPIDbContext db, int PostId, int RareUserId, int ReactionId) => 
 {
-    var rareUser = db.RareUsers.FirstOrDefault(user => user.Id == Id);
+    var Post = db.Posts.SingleOrDefault(p => p.Id == PostId);
+    var User = db.RareUsers.SingleOrDefault(u => u.Id == RareUserId);
+    var Reaction = db.Reactions.SingleOrDefault(r => r.Id == ReactionId);
 
-    if (rareUser == null)
+    PostReaction postReaction = new PostReaction() 
     {
-        return Results.NotFound("RareUser not found.");
-    }
+        Post = Post,
+        RareUser = User,
+        Reaction = Reaction
+    };
 
-    var userPosts = db.Posts.Where(post => post.RareUserId == Id).ToList();
-
-    return Results.Json(userPosts);
+    db.PostUserReaction.Add(postReaction);
+    db.SaveChanges();
+    return Results.NoContent();
 });
 
 // View posts from subscribed users
@@ -348,10 +392,20 @@ app.MapPost("/posttag", (int PostId, int TagId, RareAPIDbContext db) =>
 {
     var post = db.Posts.Include(p => p.Tags).FirstOrDefault(p => p.Id == PostId);
 
+
     if (post == null)
     {
         return Results.NotFound();
     }
+
+    return Results.Ok(post);
+        
+        
+    
+});
+
+
+
 
     var tagToAdd = db.Tags.FirstOrDefault(t => t.Id == TagId);
 
@@ -409,6 +463,7 @@ app.MapGet("/tags/{id}", (RareAPIDbContext db, string tag) =>
     // Return the posts associated with the tag as JSON
     return Results.Json(postsByTag);
 });
+
 
 app.Run();
 
