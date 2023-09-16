@@ -11,6 +11,7 @@ using GroupRareAPI.Models;
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<UserTypeChangeRequest> UserTypeChangeRequests { get; set; }
+        public DbSet<PostReaction> PostUserReaction { get; set; }
 
     public RareAPIDbContext(DbContextOptions<RareAPIDbContext> context) : base(context)
     {
@@ -43,8 +44,7 @@ using GroupRareAPI.Models;
         });
         modelBuilder.Entity<Reaction>().HasData(new Reaction[]
         {
-        new Reaction {Id = 1, Label = "Heart", ImageUrl = "Image"},
-        });
+        new Reaction {Id = 1, Label = "Heart", ImageUrl = "Image"},        });
         modelBuilder.Entity<Subscription>().HasData(new Subscription[]
         {
         new Subscription {Id = 1, FollowerId = 2, AuthorId = 1, CreatedOn = DateTime.Now, EndedOn = DateTime.Now},
