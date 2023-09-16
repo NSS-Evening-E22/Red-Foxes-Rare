@@ -108,6 +108,7 @@ app.MapPost("/categories", (Category category, RareAPIDbContext db) =>
     return Results.Created($"/category/{category.Id}", category);
 });
 
+//Delete Category
 app.MapDelete("/api/categories/{Id}", (int Id, RareAPIDbContext db) =>
 {
     Category category = db.Categories.FirstOrDefault(c => c.Id == Id);
@@ -122,6 +123,44 @@ app.MapDelete("/api/categories/{Id}", (int Id, RareAPIDbContext db) =>
 
     return Results.Ok(category);
 });
+//Edit a Category 
+app.MapPut("/category/{CategoryId}", (int Id, Category updatedCategory, RareAPIDbContext db) =>
+{
+    Category existingCategory = db.Categories.FirstOrDefault(c => c.Id == Id);
+
+    if (existingCategory == null)
+    {
+        return Results.NotFound();
+    }
+
+    existingCategory.Label = updatedCategory.Label;
+ 
+    db.SaveChanges();
+
+    return Results.Ok(existingCategory);
+});
+
+//View single user profile details
+
+app.MapGet("/rareusers/{Id}", (int Id, RareAPIDbContext db) =>
+{
+    RareUser rareUser = db.RareUsers.FirstOrDefault(u => u.Id == Id);
+
+    if (rareUser == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(rareUser);
+});
+
+//View all user porfile
+app.MapGet("/rareusers", (RareAPIDbContext db ) =>
+{
+    var usersAlphabetical = db.RareUsers.OrderBy(user => user.FirstName).ToList();
+    return usersAlphabetical;
+});
+
 
 // Get all posts
 app.MapGet("/posts", (RareAPIDbContext db) =>
@@ -220,6 +259,24 @@ app.MapDelete("/posts/{postId}", (RareAPIDbContext db, int postId) =>
     return Results.NoContent();
 });
 
+// View posts from subscribed users
+app.MapGet("/home/subscribed/{followerId}", (RareAPIDbContext db, int userId) =>
+{
+    List<int> subscribedUserIds = db.Subscriptions
+    .Where(sub => sub.FollowerId == userId)
+    .Select(sub => sub.AuthorId)
+    .ToList();
+
+    var posts = db.Posts
+    .Include(p => p.RareUser)
+    .Include(p => p.Category)
+    .Include(p => p.Tags)
+    .Include(p => p.Reactions)
+    .Where(p => subscribedUserIds.Contains(p.RareUserId));
+
+    return Results.Ok(posts);
+});
+
 //TAGS ENDPOINTS
 app.MapPost("/tags", (RareAPIDbContext db, Tag tag) =>
 {
@@ -264,7 +321,7 @@ app.MapDelete("/tags/{id}", (RareAPIDbContext db, int id) =>
     db.Tags.Remove(tag);
     db.SaveChanges();
     return Results.NoContent();
-});
+ )};
 
 app.Run();
 
