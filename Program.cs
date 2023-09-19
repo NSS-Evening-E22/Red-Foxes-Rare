@@ -3,18 +3,21 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
+var DefaultCors = "_DefaultCors";
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
+    options.AddPolicy(name: DefaultCors,
+       
         policy =>
         {
             policy.WithOrigins("http://localhost:3000",
                                 "http://localhost:7033")
                                 .AllowAnyHeader()
-                                .AllowAnyMethod();
+                                .AllowAnyMethod()
+                                .AllowAnyOrigin();
         });
 });
 
@@ -37,6 +40,8 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 var app = builder.Build();
+
+app.UseCors(DefaultCors);
 
 // Add a comment
 app.MapPost("/posts/{id}/comment", (RareAPIDbContext db, Comment comment) =>
