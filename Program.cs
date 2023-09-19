@@ -469,6 +469,28 @@ app.MapGet("/tags/{id}", (RareAPIDbContext db, string tag) =>
     return Results.Json(postsByTag);
 });
 
+app.MapGet("/checkuser/{uid}", (RareAPIDbContext db, string uid) =>
+{
+    var userExist = db.RareUsers.Where(x => x.UID == uid).ToList();
+    if (userExist == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(userExist);
+});
+
+app.MapPost("/register", (RareAPIDbContext db, RareUser user) =>
+{
+    db.RareUsers.Add(user);
+    db.SaveChanges();
+    return Results.Created($"/api/user/user.Id", user);
+});
+
+app.MapGet("/api/users", (RareAPIDbContext db) =>
+{
+    return db.RareUsers.ToList();
+});
+
 
 app.Run();
 
