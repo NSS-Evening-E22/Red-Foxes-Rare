@@ -216,9 +216,9 @@ app.MapPut("/category/{CategoryId}", (int Id, Category updatedCategory, RareAPID
 
 //View single user profile details
 
-app.MapGet("/rareusers/{Id}", (int Id, RareAPIDbContext db) =>
+app.MapGet("/rareusers/{Id}", (string UID, RareAPIDbContext db) =>
 {
-    RareUser rareUser = db.RareUsers.FirstOrDefault(u => u.Id == Id);
+    RareUser rareUser = db.RareUsers.FirstOrDefault(u => u.UID == UID);
 
     if (rareUser == null)
     {
