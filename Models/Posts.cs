@@ -11,10 +11,14 @@ namespace GroupRareAPI.Models
         public Category Category { get; set; }
         public string Title { get; set; }
         public DateTime PublicationDate {  get; set; }
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
         public string Content { get; set; }
         public bool Approved { get; set; }
         public List<Reaction> Reactions { get; set; }
         public List<Tag> Tags { get; set; }
+        public Post()
+        {
+            this.PublicationDate = DateTime.Now;
+        }
     }
 }
