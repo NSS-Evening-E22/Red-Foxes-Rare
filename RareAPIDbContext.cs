@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using GroupRareAPI.Models;
-
-    public class RareAPIDbContext : DbContext
+public class RareAPIDbContext : DbContext
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -12,7 +11,7 @@ using GroupRareAPI.Models;
         public DbSet<Tag> Tags { get; set; }
         public DbSet<UserTypeChangeRequest> UserTypeChangeRequests { get; set; }
         public DbSet<PostReaction> PostUserReaction { get; set; }
-
+    
     public RareAPIDbContext(DbContextOptions<RareAPIDbContext> context) : base(context)
     {
 

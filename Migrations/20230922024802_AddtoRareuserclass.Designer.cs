@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GroupRareAPI.Migrations
 {
     [DbContext(typeof(RareAPIDbContext))]
-    partial class RareAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230922024802_AddtoRareuserclass")]
+    partial class AddtoRareuserclass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,7 +83,7 @@ namespace GroupRareAPI.Migrations
                             Id = 1,
                             AuthorId = 1,
                             Content = "Comment content",
-                            CreatedOn = new DateTime(2023, 9, 21, 21, 49, 48, 933, DateTimeKind.Local).AddTicks(1062),
+                            CreatedOn = new DateTime(2023, 9, 21, 21, 48, 1, 385, DateTimeKind.Local).AddTicks(8362),
                             PostId = 1
                         });
                 });
@@ -132,7 +135,7 @@ namespace GroupRareAPI.Migrations
                             CategoryId = 1,
                             Content = "Post content",
                             ImageUrl = "Image",
-                            PublicationDate = new DateTime(2023, 9, 21, 21, 49, 48, 933, DateTimeKind.Local).AddTicks(1113),
+                            PublicationDate = new DateTime(2023, 9, 21, 21, 48, 1, 385, DateTimeKind.Local).AddTicks(8437),
                             RareUserId = 1,
                             Title = "Post"
                         });
@@ -217,7 +220,7 @@ namespace GroupRareAPI.Migrations
                             Id = 1,
                             Active = false,
                             Bio = "Hi",
-                            CreateOn = new DateTime(2023, 9, 21, 21, 49, 48, 933, DateTimeKind.Local).AddTicks(1132),
+                            CreateOn = new DateTime(2023, 9, 21, 21, 48, 1, 385, DateTimeKind.Local).AddTicks(8469),
                             Email = "bob@email",
                             FirstName = "Bob",
                             IsStaff = true,
@@ -230,7 +233,7 @@ namespace GroupRareAPI.Migrations
                             Id = 2,
                             Active = true,
                             Bio = "...",
-                            CreateOn = new DateTime(2023, 9, 21, 21, 49, 48, 933, DateTimeKind.Local).AddTicks(1137),
+                            CreateOn = new DateTime(2023, 9, 21, 21, 48, 1, 385, DateTimeKind.Local).AddTicks(8474),
                             Email = "felix@coolcars.com",
                             FirstName = "Felix",
                             IsStaff = true,
@@ -243,7 +246,7 @@ namespace GroupRareAPI.Migrations
                             Id = 3,
                             Active = true,
                             Bio = "I rly like Jim UwU",
-                            CreateOn = new DateTime(2023, 9, 21, 21, 49, 48, 933, DateTimeKind.Local).AddTicks(1141),
+                            CreateOn = new DateTime(2023, 9, 21, 21, 48, 1, 385, DateTimeKind.Local).AddTicks(8478),
                             Email = "kim@email",
                             FirstName = "Kim",
                             IsStaff = false,
@@ -256,7 +259,7 @@ namespace GroupRareAPI.Migrations
                             Id = 4,
                             Active = true,
                             Bio = "Im slim and im jim",
-                            CreateOn = new DateTime(2023, 9, 21, 21, 49, 48, 933, DateTimeKind.Local).AddTicks(1145),
+                            CreateOn = new DateTime(2023, 9, 21, 21, 48, 1, 385, DateTimeKind.Local).AddTicks(8482),
                             Email = "slimjim",
                             FirstName = "Slimothy",
                             IsStaff = false,
@@ -328,8 +331,8 @@ namespace GroupRareAPI.Migrations
                         {
                             Id = 1,
                             AuthorId = 1,
-                            CreatedOn = new DateTime(2023, 9, 21, 21, 49, 48, 933, DateTimeKind.Local).AddTicks(1169),
-                            EndedOn = new DateTime(2023, 9, 21, 21, 49, 48, 933, DateTimeKind.Local).AddTicks(1171),
+                            CreatedOn = new DateTime(2023, 9, 21, 21, 48, 1, 385, DateTimeKind.Local).AddTicks(8528),
+                            EndedOn = new DateTime(2023, 9, 21, 21, 48, 1, 385, DateTimeKind.Local).AddTicks(8531),
                             FollowerId = 2
                         });
                 });

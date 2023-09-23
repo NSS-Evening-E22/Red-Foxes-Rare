@@ -16,6 +16,11 @@
         public List <Subscription> subscriptions { get; set; }
 
         public List <Comment> comments { get; set; } 
-   
+
+        public ICollection<Post> Posts { get; set; }
+        public RareUser()
+        {
+            this.CreateOn = DateTime.Now;
+        }
     }
 }

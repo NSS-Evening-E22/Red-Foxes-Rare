@@ -1,3 +1,4 @@
+using GroupRareAPI.DTO;
 using GroupRareAPI.Models;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: DefaultCors,
-       
+
         policy =>
         {
             policy.WithOrigins("http://localhost:3000",
@@ -59,9 +60,9 @@ app.MapGet("/posts/{id}/comment", (RareAPIDbContext db, int postId) =>
 });
 
 // Edit a comment
-app.MapPut("/posts/{id}/comment", (RareAPIDbContext db, int commentId, Comment comment) => 
+app.MapPut("/posts/{id}/comment", (RareAPIDbContext db, int commentId, Comment comment) =>
 {
-    Comment commentToUpdate = db.Comments.FirstOrDefault(c => c.Id ==  commentId);
+    Comment commentToUpdate = db.Comments.FirstOrDefault(c => c.Id == commentId);
     if (commentToUpdate == null)
     {
         return Results.NotFound();
@@ -110,8 +111,9 @@ app.UseHttpsRedirection();
 
 
 //Create a subscription
-app.MapPost("/api/subscriptions", (RareAPIDbContext db, Subscription subscription) => 
-{   subscription.CreatedOn = DateTime.Now;
+app.MapPost("/api/subscriptions", (RareAPIDbContext db, Subscription subscription) =>
+{
+    subscription.CreatedOn = DateTime.Now;
     subscription.EndedOn = DateTime.Now.AddMonths(6);
     db.Subscriptions.Add(subscription);
     db.SaveChanges();
@@ -119,7 +121,7 @@ app.MapPost("/api/subscriptions", (RareAPIDbContext db, Subscription subscriptio
 });
 
 //update a subscription to add a endedOn time
-app.MapPut("/api/subscriptions/{id}", (RareAPIDbContext db, int id, Subscription subscription) => 
+app.MapPut("/api/subscriptions/{id}", (RareAPIDbContext db, int id, Subscription subscription) =>
 
 {
     Subscription subscriptionToUpdate = db.Subscriptions.SingleOrDefault(s => s.Id == id);
@@ -133,7 +135,7 @@ app.MapPut("/api/subscriptions/{id}", (RareAPIDbContext db, int id, Subscription
 });
 
 //create a new reaction
-app.MapPost("/api/reactions", (RareAPIDbContext db, Reaction reaction) => 
+app.MapPost("/api/reactions", (RareAPIDbContext db, Reaction reaction) =>
 {
     db.Reactions.Add(reaction);
     db.SaveChanges();
@@ -145,7 +147,7 @@ app.MapPost("/api/reactions", (RareAPIDbContext db, Reaction reaction) =>
 app.MapPost("/api/postuserreaction", (RareAPIDbContext db, PostReaction postUserReaction) =>
 {
     db.PostUserReaction.Add(postUserReaction);
-return Results.Ok();
+    return Results.Ok();
 });
 
 //View all categories
@@ -206,7 +208,7 @@ app.MapPut("/category/{CategoryId}", (int Id, Category updatedCategory, RareAPID
     }
 
     existingCategory.Label = updatedCategory.Label;
- 
+
     db.SaveChanges();
 
     return Results.Ok(existingCategory);
@@ -227,7 +229,7 @@ app.MapGet("/rareusers/{Id}", (int Id, RareAPIDbContext db) =>
 });
 
 //View all user porfile
-app.MapGet("/rareusers", (RareAPIDbContext db ) =>
+app.MapGet("/rareusers", (RareAPIDbContext db) =>
 {
     var usersAlphabetical = db.RareUsers.OrderBy(user => user.FirstName).ToList();
     return usersAlphabetical;
@@ -284,18 +286,20 @@ app.MapGet("/posts/users/{userId}", (RareAPIDbContext db, int userId) =>
 });
 
 // Create a post
-app.MapPost("/posts", (RareAPIDbContext db, Post post) =>
+app.MapPost("/post", (RareAPIDbContext db, CreatePostDTO post) =>
 {
-    try
+    Post newPost = new()
     {
-        db.Posts.Add(post);
-        db.SaveChanges();
-        return Results.Created($"/posts/{post.Id}", post);
-    }
-    catch (DbUpdateException)
-    {
-        return Results.NotFound("Post was not created");
-    }
+        ImageUrl = post.ImageUrl,
+        Content = post.Content,
+        Title = post.Title,
+    };
+    newPost.RareUser = db.RareUsers.FirstOrDefault(x => x.UID == post.RareUserId);
+    newPost.Category = db.Categories.FirstOrDefault(c => c.Id == post.CategoryId);
+
+    db.Add(newPost);
+    db.SaveChanges();
+    return Results.Created($"/posts/", post);
 });
 
 // Edit a post
